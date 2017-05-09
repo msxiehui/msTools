@@ -1,0 +1,33 @@
+﻿msTools
+H5-JS开发工具类
+
+版本号：1.0.3    更新日期：2016.11.5  更新人员：msxiehui
+更新内容：
+    1、修改 ms.reSet 自动方法的定位效果。在PC以及移动中都可以居中显示。
+
+版本号：1.0.2    更新日期：2016.11.3 
+更新内容：
+    1、增加  ms.log 调试输出功能。在页面显示 log窗口 输出调试信息。
+    
+版本号：1.0.1    更新日期：2016.10.1
+更新内容:
+	01.增加 【ms.setCookie        {写cookies。
+	02.增加 【ms.jQueryOrZepto    {判断当前函数是否需要 jQuery 或 Zepto 的支持
+	03.增加 【ms.height           {获取窗口高度
+	04.增加 【ms.width            {获取窗口宽度
+	05.增加 【ms.loadings         {加载进度百分比
+	06.增加 【ms.reSet            {自动缩放和定位页面中的元素
+	07.增加 【ms.getStrCenter     {取出中间文本
+	08.增加 【ms.isArray          {判断是否为数组
+	09.增加 【ms.arrIndexOf       {取元素在数组中的位置
+	10.增加 【ms.rand             {取最小数到最大数之间的随机数
+	11.增加 【ms.getNowFormatDate {返回当前日期时间的文本格式
+	12.增加 【ms.isEmail          {验证是否是邮箱
+	13.增加 【ms.isName           {验证是否是用户姓名
+	14.增加 【ms.isPhone          {验证是否是手机号
+	15.增加 【ms.browser          {判断浏览器
+	16.增加 【ms.isPC             {判断是否 为电脑
+	17.增加 【ms.getALL           {获取 URL get 参数
+	18.增加 【ms.getArg           {根据 参数名 获取 URL 参数值
+	19.增加 【ms.getCookie        {取Cookies
+	20.增加 【ms.delCookie        {删除 Cookie
