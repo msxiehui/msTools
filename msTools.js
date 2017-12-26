@@ -15,7 +15,8 @@
     var ms = window.ms = window.$$ = function (selector, context) {
         return new ms.fn.init(selector, context);
     };
-    ms.version = "1.0.3";
+    ms.version = "1.0.4";
+    
 
     /*
      *  ****************************内置属性  不做太多设置，
@@ -83,6 +84,7 @@
     /**
      * 输出页面提示值
      * @since  1.0.2
+     * @deprecated since version 1.0.4  推荐使用 Vconsole.js  准备重写
      * @example
      * <p>   ms.log.init()  默认是空值，直接显示到页面body
      * <p>   ms.log.log()   页面输出，console输出：返回值
@@ -258,7 +260,6 @@
         this.show=function () {
             $("#"+this.id).fadeIn(200);
         }
-
     }
 
     /**
@@ -317,6 +318,7 @@
     /**
 	 *自动缩放和定位页面中的元素
 	 * @since  1.0.1
+     * @version 0.2
      * @param {String}[_elem=".csBox"]  需要视频的元素 可以是 类，ID 等，如果为空则默认为 类：.csBox
      * @param callback {Function} 回调函函数，data 当前元素的 缩放值，系数等，i 当前循环中的第几个(0开始)，num 当前总循环数
      * @param _w 设计图宽度  默认为 750；
@@ -358,7 +360,16 @@
         if(typeof(hh)=="undefined" || hh=="" || hh<=0){
             hh=1136;
         }
-
+    
+    
+        var ios=!!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
+        
+        console.log(ios);
+        if(ios){
+            console.log("这是苹果噢")
+        }
+        
+        
         $(elem).each(function(i) {
             var data = elemScale($(this));
             $(this).css({
@@ -579,13 +590,21 @@
         var u = navigator.userAgent,
             app = navigator.appVersion;
         return {
-            webKit: u.indexOf('AppleWebKit') > -1,
-            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
-            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
-            weixin: u.indexOf('MicroMessenger') > -1,
-            txnews: u.indexOf('qqnews') > -1,
-            sinawb: u.indexOf('weibo') > -1,
-            mqq: u.indexOf('QQ') > -1
+            trident: u.indexOf('Trident') > -1, //IE内核
+            presto: u.indexOf('Presto') > -1, //opera内核
+            webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+            gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1,//火狐内核
+            mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+            ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+            iPhone: u.indexOf('iPhone') > -1 , //是否为iPhone或者QQHD浏览器
+            iPad: u.indexOf('iPad') > -1, //是否iPad
+            webApp: u.indexOf('Safari') == -1, //是否web应该程序，没有头部与底部
+            weixin: u.indexOf('MicroMessenger') > -1, //是否微信 （2015-01-22新增）
+            qq: u.match(/\sQQ/i) == " qq" ,//是否QQ
+            android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端
+            txnews: u.indexOf('qqnews') > -1, //腾讯新闻
+            sinawb: u.indexOf('weibo') > -1, //新浪微博
+            mqq: u.indexOf('QQ') > -1 //手机QQ
         };
     }();
 
