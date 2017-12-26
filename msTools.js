@@ -366,7 +366,9 @@
         
         console.log(ios);
         if(ios){
-            console.log("这是苹果噢")
+            console.log("这是苹果噢1")
+            console.log("这是苹果噢2")
+            console.log("这是苹果噢3")
         }
         
         
