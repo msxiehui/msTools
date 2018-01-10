@@ -313,30 +313,8 @@
 			}
 		}
 	}
-    
-    // 空数据判断
-    ms.isOpenID=function(wxid) {
-        if(wxid == null || typeof(wxid) == undefined || typeof(wxid) == null || wxid == "" || wxid <= 0 || wxid == "null" || wxid == "undefined") {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    
-    ms.getPathName=function(){
-        // var webPath=window.location.pathname.substring(1);
-        var webPath=window.location.pathname;
-        var num=webPath.indexOf(".");
-        if(num!=-1){
-            webPath=webPath.substring(0,num);
-        }
-        var newPath=webPath.substring(0,webPath.lastIndexOf("/"));
-        return newPath
-    }
-    ms.getHost=function () {
-       return window.location.protocol+"//"+window.location.host +ms.getPathName()+"/";
-    }
-    
+
+	
 	ms.isIphoneX=function () {
         var ios=!!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
         var isX=false;
@@ -378,452 +356,75 @@
      *
      */
 
-
     ms.reSet=function(_elem,callback,_w,_h){
-        if(!ms.jQueryOrZepto()){
-            return;
-        }
-        var elem,ww,hh;
+         if(!ms.jQueryOrZepto()){
+             return;
+         }
+         var elem,ww,hh;
         elem=_elem;
         ww=_w;
         hh=_h;
-        if(typeof(elem)=="undefined" || elem==""){
+         if(typeof(elem)=="undefined" || elem==""){
             elem=".csBox";
         }
         if(typeof(ww)=="undefined" || ww=="" || ww<=0){
-            ww=750;
+           ww=750;
         }
         if(typeof(hh)=="undefined" || hh=="" || hh<=0){
             hh=1136;
         }
-    
-        var isX=false;
+        
+        var isX=ms.isIphoneX();
         var scale=window.innerWidth/window.innerHeight;
-        if(scale<0.56){
-            isX=true;
-        }
         $(elem).each(function(i) {
-            var cb = elemScale($(this));
+            var data = elemScale($(this));
             $(this).css({
                 "position": "absolute",
-                "width": cb.newWidth,
-                "height": cb.newHeight,
-                "margin-left":cb.marginLeft,
-                "margin-top": cb.marginTop
+                "width": data.newWidth,
+                "height": data.newHeight,
+                "margin-left":data.marginLeft,
+                "margin-top": data.marginTop
             });
+
             if (callback != null) {
-                callback(cb,i,$(elem).length);
+                callback(data,i,$(elem).length);
             }
         });
-    
+        
         //自定义 工具对象。
         function elemScale(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  ele.attr("height");
-            obj.Ewidth = ele.attr("width");
-        
-            obj.Eleft = ele.attr("left");
-            obj.Etop =  ele.attr("top");
-        
-            obj.scale=window.innerHeight/hh;
-            obj.Xtop=0;
+            this.target=ele;
+            this.Eheight =  ele.attr("height");
+            this.Ewidth = ele.attr("width");
+            
+            this.Eleft = ele.attr("left");
+            this.Etop =  ele.attr("top");
+    
+            this.scale=window.innerHeight/hh;
+            this.Xtop=0;
             if(isX){
-                console.log("矮小比例")
-                 obj.scale=window.innerHeight*(1-(0.63-scale))/hh;
-                 obj.Xtop=(window.innerHeight-hh*obj.scale)/2;
+                console.log("这是苹果X噢")
+                this.scale=window.innerHeight*(1-(0.63-scale))/hh;
+                this.Xtop=(window.innerHeight-hh*this.scale)/2;
             }
-
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = obj.Eheight*obj.scale;
+    
+            this.newWidth =  this.Ewidth*this.scale;
+            this.newHeight = this.Eheight*this.scale;
             //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =(window.innerWidth-ww*obj.scale)/2+obj.Eleft*obj.scale;
-            obj.marginTop = obj.Etop*obj.scale+obj.Xtop;
-
-            var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-    }
-    
-    ms.reSet_test=function(_elem,callback,_w,_h){
-        if(!ms.jQueryOrZepto()){
-            return;
-        }
-        var elem,ww,hh;
-        elem=_elem;
-        ww=_w;
-        hh=_h;
-        if(typeof(elem)=="undefined" || elem==""){
-            elem=".csBox";
-        }
-        if(typeof(ww)=="undefined" || ww=="" || ww<=0){
-            ww=750;
-        }
-        if(typeof(hh)=="undefined" || hh=="" || hh<=0){
-            hh=1136;
-        }
-    
-        var _scale=window.innerHeight/hh;
-        console.log("缩放比-----：",_scale)
-        console.log(window.innerWidth>ww*_scale)
-        var Left=window.innerWidth-(ww*_scale);
-        console.log("默认偏移值"+Left);
-        
-        $(elem).each(function(i) {
-            if(Left>=0 && Left<50){
-                _scale=window.innerWidth/ww
-                console.log("使用宽度适配",_scale)
-                var cb = elemScaleWidth($(this));
-            }else{
-                console.log("使用高度适配",_scale)
-                var cb = elemScale($(this));
-            }
-    
-           // var cb = elemScale($(this));
-            
-            $(this).css({
-                "position": "absolute",
-                "width": cb.newWidth,
-                "height": cb.newHeight,
-                "margin-left":cb.marginLeft,
-                "margin-top": cb.marginTop
-            });
-            if (callback != null) {
-                callback(cb,i,$(elem).length);
-            }
-        });
-    
-    
-        //自定义 工具对象。
-        function elemScale(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  ele.attr("height");
-            obj.Ewidth = ele.attr("width");
-        
-            obj.Eleft = ele.attr("left");
-            obj.Etop =  ele.attr("top");
-        
-            if(Left>50){
-                console.log("方形屏幕-增加1.1 的缩放值")
-                obj.scale=_scale*1.1
-               // obj.scale=window.innerHeight*(1-(0.63-scale))/hh;
-                obj.Xtop=(window.innerHeight-hh*obj.scale)/2;
-            }else{
-                obj.scale=_scale
-            }
-
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = obj.Eheight*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =(window.innerWidth-ww*obj.scale)/2+obj.Eleft*obj.scale;
-            obj.marginTop = obj.Etop*obj.scale+obj.Xtop;
-
-            
-        var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-        
-        //自定义 工具对象。
-        function elemScaleWidth(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  ele.attr("height");
-            obj.Ewidth = ele.attr("width");
-        
-            obj.Eleft = ele.attr("left");
-            obj.Etop =  ele.attr("top");
-        
-            
-            
-            obj.scale=_scale
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = obj.Eheight*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =obj.Eleft*obj.scale;
-            obj.marginTop =(window.innerHeight-hh*obj.scale)/2+obj.Etop*obj.scale;
-    
-            var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-    }
-    ms.reSet_test2=function(_elem,callback,_w,_h,_offy){
-        if(!ms.jQueryOrZepto()){
-            return;
-        }
-        var elem,ww,hh,offy;
-        elem=_elem;
-        ww=_w;
-        hh=_h;
-        offy=_offy;
-        
-        if(typeof(elem)=="undefined" || elem==""){
-            elem=".csBox";
-        }
-        if(typeof(ww)=="undefined" || ww=="" || ww<=0){
-            ww=750;
-        }
-        if(typeof(hh)=="undefined" || hh=="" || hh<=0){
-            hh=1136;
-        }
-        if(typeof(offy)=="undefined" || offy=="" || offy<=0){
-            offy=198;
-        }
-        
-        
-    
-        // var _scale=window.innerHeight/hh;
-        console.log("缩放比-----：",_scale)
-       var _scale=window.innerWidth/ww
-        var scale=window.innerWidth/window.innerHeight
-       console.log("长宽比："+scale);
-        
-        $(elem).each(function(i) {
-                console.log("使用高度适配",_scale)
-                 var cb = elemScale($(this));
-           // var cb=elemScaleWidth($(this))
-            
-           // var cb = elemScale($(this));
-            
-            $(this).css({
-                "position": "absolute",
-                "width": cb.newWidth,
-                "height": cb.newHeight,
-                "margin-left":cb.marginLeft,
-                "margin-top": cb.marginTop
-            });
-            if (callback != null) {
-                callback(cb,i,$(elem).length);
-            }
-        });
-    
-    
-        //自定义 工具对象。
-        function elemScale(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  parseInt(ele.attr("height"));
-            obj.Ewidth = parseInt(ele.attr("width"));
-        
-            obj.Eleft = parseInt(ele.attr("left"));
-            obj.Etop =  parseInt(ele.attr("top"));
-        
-             obj.scale=_scale
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = (obj.Eheight+offy)*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
- 
-            obj.marginLeft =(window.innerWidth-ww*obj.scale)/2+obj.Eleft*obj.scale;
-            // obj.marginTop = obj.Etop*obj.scale+obj.Xtop;
-            obj.marginTop = obj.Etop*obj.scale+(offy/2)*obj.scale;
-  
-            
-        var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-        
-        
-        
-        
-        
-        
-        //自定义 工具对象。
-        function elemScaleWidth(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  ele.attr("height");
-            obj.Ewidth = ele.attr("width");
-        
-            obj.Eleft = ele.attr("left");
-            obj.Etop =  ele.attr("top");
-        
-            
-            
-            obj.scale=_scale
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = obj.Eheight*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =obj.Eleft*obj.scale;
-            obj.marginTop =(window.innerHeight-hh*obj.scale)/2+obj.Etop*obj.scale;
-    
-            var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-    }
-    
-    
-    /**
-     *
-     *
-     * 设计稿尺寸，缩放尺寸。自定义偏移值
-     * @param _elem
-     * @param callback
-     * @param _w
-     * @param _h
-     * @param _offx
-     * @param _offy
-     */
-    ms.reSet_test3=function(param){
-        // if(!ms.jQueryOrZepto()){
-        //     return;
-        // }
-    
-    
-        
-        var _this={};
-        _this.default={
-            target:".csBox",
-            dw:900,
-            dh:1334,
-            sw:750,
-            sh:1136,
-            offx:-75,
-            offx:-99,
-            callback:function (data) {},
-            scale:window.innerWidth/window.innerHeight
-        }
-      
-        _this.param = param || {}
-        
-        for (var key in _this.param)  {
-            _this.default[key]=_this.param[key]
-            for(var s in _this.param[key]){
-                _this.default[key][s]=_this.param[key][s]
-            }
-        }
-    
-        
-        if(_this.default.target.indexOf("#")!=-1){
-            console.log("使用 ID 选择器")
-            var targets=document.getElementById(_this.default.target);
-        }else{
-            console.log("使用 类 选择器")
-            var targets=document.getElementsByClassName(_this.default.target.slice(1));
-        }
-    
-       console.log(targets);
-       console.log(targets.length);
-        
-    
-        for (var i=0;i<targets.length;i++){
-            console.log(i,targets[i]);
-            var ele=targets[i];
-            
-            console.log(ele.getAttribute("width"))
-            console.log(ele.getAttribute("height"));
-            console.log(ele.getAttribute("left"));
-            console.log(ele.getAttribute("top"));
-            
-            
-            ele.style.width="100px";
-            ele.style.height="100px";
-            ele.style.position="absolute";
-            ele.style.marginLeft=targets;
-            ele.style.marginTop="50px";
-        }
-        
-        
-        
-        
-        // targets[0].style.width="100px";
-        // targets[0].style.height="100px";
-        // targets[0].style.position="absolute";
-        // targets[0].style.marginLeft="absolute";
-        // targets[0].style.marginTop="absolute";
-        //
-        
-        return
-        // var scale=window.innerWidth/window.innerHeight;
-        // if(scale<0.56){
-        //     isX=true;
-        // }
-        
-        
-        $(_this.default.target).each(function(i) {
-            var cb = elemScale($(this));
-            $(this).css({
-                "position": "absolute",
-                "width": cb.newWidth,
-                "height": cb.newHeight,
-                "margin-left":cb.marginLeft,
-                "margin-top": cb.marginTop
-            });
-            if (callback != null) {
-                callback(cb,i,$(elem).length);
-            }
-        });
-        
-        //自定义 工具对象。
-        function elemScale(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight = parseFloat(ele.attr("height"));
-            obj.Ewidth = parseFloat(ele.attr("width"));
-            
-            obj.Eleft = parseFloat(ele.attr("left"));
-            obj.Etop =  parseFloat(ele.attr("top"));
-            
-            obj.scale=window.innerHeight/hh;
-            obj.Xtop=0;
-            if(isX){
-               // console.log("矮小比例")
-               // obj.scale=window.innerHeight*(1-(0.63-scale))/hh;
-                //obj.Xtop=(window.innerHeight-hh*obj.scale)/2;
-            }
-            
-            obj.offx=Math.abs(offx*2);
-            obj.offy=Math.abs(offy*2);
-            
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = (obj.Eheight+obj.offy)*obj.scale;
-            
-            obj.Xtop=offy*obj.scale;
-            
-            
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =(window.innerWidth-ww*obj.scale)/2+obj.Eleft*obj.scale;
-            obj.marginTop = obj.Etop*obj.scale+obj.Xtop;
+            this.marginLeft =(window.innerWidth-ww*this.scale)/2+this.Eleft*this.scale;
+            this.marginTop = this.Etop*this.scale+this.Xtop;
             
             var name=ele.attr("cs-name");
             if(name!=""){
-                obj.name=name;
+                this.name=name;
             }else{
-                obj.name=ele.attr("src");
+                this.name=ele.attr("src");
             }
-            return obj;
+
+            return this;
         }
     }
-    
+
     /**
 	 *自动缩放和定位页面中的元素
 	 * @since  1.0.1
@@ -894,6 +495,7 @@
             if (callback != null) {
 
                 callback(data,i,$(elem).length);
+
             }
         });
         //自定义 工具对象。
@@ -1242,6 +844,5 @@
 	
 	
     ms.fn.init.prototype = ms.fn;
-    console.log("msTools:"+ms.version);
 
 })();
