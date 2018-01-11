@@ -697,9 +697,7 @@
         // if(!ms.jQueryOrZepto()){
         //     return;
         // }
-    
-    
-        
+   
         var _this={};
         _this.default={
             target:".csBox",
@@ -707,12 +705,18 @@
             dh:1334,
             sw:750,
             sh:1136,
-            offx:-75,
-            offx:-99,
-            callback:function (data) {},
-            scale:window.innerWidth/window.innerHeight
+            safeW:750,
+            safeH:1206,
+            offx:null,
+            offy:null,
+            change:function (data) {},
+            complete:function (data) {},
+            scale:null,
+            width:window.innerWidth,
+            height:window.innerHeight,
         }
-      
+        
+        _this.targets=[];
         _this.param = param || {}
         
         for (var key in _this.param)  {
@@ -721,105 +725,127 @@
                 _this.default[key][s]=_this.param[key][s]
             }
         }
-    
         
-        if(_this.default.target.indexOf("#")!=-1){
+        
+        
+        if(_this.default.scale==null){
+            _this.default.scale = _this.default.height/_this.default.sh;
+        }
+        
+        
+        if(_this.default.offx==null){
+            _this.default.offx=(_this.default.sw-_this.default.dw)/2
+        }
+
+        if(_this.default.offy==null){
+            _this.default.offy=(_this.default.sh-_this.default.dh)/2
+        }
+        
+        
+        console.log(_this.default);
+        
+        
+        var strOne=_this.default.target.slice(0,1);
+        if(strOne=="#"){
             console.log("使用 ID 选择器")
-            var targets=document.getElementById(_this.default.target);
-        }else{
+            var targets=document.getElementById(_this.default.target.slice(1));
+        }else if (strOne=="."){
             console.log("使用 类 选择器")
             var targets=document.getElementsByClassName(_this.default.target.slice(1));
+        }else{
+            console.log("默认：使用类 选择器")
+            var targets=document.getElementsByClassName(_this.default.target);
         }
-    
-       console.log(targets);
-       console.log(targets.length);
+
         
-    
+        console.log("宽度安全区：",_this.default.safeW*_this.default.scale)
+        var newWidth=parseFloat((_this.default.dw*_this.default.scale).toFixed(3));
+        
+        console.log("新的整体宽度：",newWidth)
+        var offsetX=(_this.default.width-_this.default.dw*_this.default.scale)/2
+        console.log("新的整体偏移值X：",offsetX)
+        var safaX=(_this.default.dw-_this.default.safeW)/2*_this.default.scale
+        console.log("新的安全区边界：",safaX)
+        var isChuJie=safaX<Math.abs(offsetX);
+        console.log("安全区判断是否出界:",isChuJie);
+        console.log("出界差值:",safaX-Math.abs(offsetX));
+        var xxx=(safaX-Math.abs(offsetX))/_this.default.width
+        console.log("出界缩放值调整：",xxx)
+        if(isChuJie){
+             _this.default.scale+=xxx
+            console.log("修订缩放值：",_this.default.scale)
+        }
+
+        console.log("高度度安全区",_this.default.safeH*_this.default.scale)
+        
         for (var i=0;i<targets.length;i++){
-            console.log(i,targets[i]);
+          // console.log(i,targets[i]);
             var ele=targets[i];
-            
-            console.log(ele.getAttribute("width"))
-            console.log(ele.getAttribute("height"));
-            console.log(ele.getAttribute("left"));
-            console.log(ele.getAttribute("top"));
-            
-            
-            ele.style.width="100px";
-            ele.style.height="100px";
+            _this.targets.push(ele);
+            var cb=elemScale(ele);
+            ele.style.width=cb.newWidth+"px";
+            ele.style.height=cb.newHeight+"px";
             ele.style.position="absolute";
-            ele.style.marginLeft=targets;
-            ele.style.marginTop="50px";
+            ele.style.marginLeft=cb.marginLeft+"px";
+            ele.style.marginTop=cb.marginTop+"px";
+            _this.default.change(cb);
         }
+        _this.default.complete(_this);
         
         
         
-        
-        // targets[0].style.width="100px";
-        // targets[0].style.height="100px";
-        // targets[0].style.position="absolute";
-        // targets[0].style.marginLeft="absolute";
-        // targets[0].style.marginTop="absolute";
-        //
-        
+
         return
         // var scale=window.innerWidth/window.innerHeight;
         // if(scale<0.56){
         //     isX=true;
         // }
         
-        
-        $(_this.default.target).each(function(i) {
-            var cb = elemScale($(this));
-            $(this).css({
-                "position": "absolute",
-                "width": cb.newWidth,
-                "height": cb.newHeight,
-                "margin-left":cb.marginLeft,
-                "margin-top": cb.marginTop
-            });
-            if (callback != null) {
-                callback(cb,i,$(elem).length);
-            }
-        });
-        
+
         //自定义 工具对象。
         function elemScale(ele) {
             var obj={}
             obj.target=ele;
-            obj.Eheight = parseFloat(ele.attr("height"));
-            obj.Ewidth = parseFloat(ele.attr("width"));
+    
+            obj.Eheight = parseFloat(ele.getAttribute("height"));
+            obj.Ewidth = parseFloat(ele.getAttribute("width"));
             
-            obj.Eleft = parseFloat(ele.attr("left"));
-            obj.Etop =  parseFloat(ele.attr("top"));
+            obj.Eleft = parseFloat(ele.getAttribute("left"));
+            obj.Etop =  parseFloat(ele.getAttribute("top"));
             
-            obj.scale=window.innerHeight/hh;
+            obj.scale=_this.default.scale;
+            
+            
+          
             obj.Xtop=0;
-            if(isX){
-               // console.log("矮小比例")
-               // obj.scale=window.innerHeight*(1-(0.63-scale))/hh;
-                //obj.Xtop=(window.innerHeight-hh*obj.scale)/2;
-            }
             
-            obj.offx=Math.abs(offx*2);
-            obj.offy=Math.abs(offy*2);
+            //obj.offx=Math.abs(offx*2);
+            //obj.offy=Math.abs(offy*2);
             
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = (obj.Eheight+obj.offy)*obj.scale;
+            obj.newWidth =  obj.Ewidth*_this.default.scale;
+            obj.newHeight = obj.Eheight*_this.default.scale;
             
-            obj.Xtop=offy*obj.scale;
+            //obj.Xtop=offy*obj.scale;
             
             
             //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =(window.innerWidth-ww*obj.scale)/2+obj.Eleft*obj.scale;
-            obj.marginTop = obj.Etop*obj.scale+obj.Xtop;
+            // obj.marginLeft =(window.innerWidth-_this.default.sw*_this.default.scale)/2+obj.Eleft*_this.default.scale+_this.default.offx*_this.default.scale;
+        
+            obj.marginLeft =(_this.default.width -_this.default.sw*_this.default.scale)/2+(obj.Eleft+_this.default.offx)*_this.default.scale;
             
-            var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
+            
+            // obj.marginTop = obj.Etop*obj.scale+obj.Xtop+_this.default.offy*_this.default.scale;
+          //   obj.marginTop = (obj.Etop+_this.default.offy)*_this.default.scale;
+            obj.marginTop =(_this.default.height -_this.default.sh*_this.default.scale)/2+(obj.Etop+_this.default.offy)*_this.default.scale;
+            
+            
+             
+            // var name=ele.attr("cs-name");
+            // if(name!=""){
+            //     obj.name=name;
+            // }else{
+            //     obj.name=ele.attr("src");
+            // }
             return obj;
         }
     }
