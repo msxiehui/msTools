@@ -451,237 +451,6 @@
         }
     }
     
-    ms.reSet_test=function(_elem,callback,_w,_h){
-        if(!ms.jQueryOrZepto()){
-            return;
-        }
-        var elem,ww,hh;
-        elem=_elem;
-        ww=_w;
-        hh=_h;
-        if(typeof(elem)=="undefined" || elem==""){
-            elem=".csBox";
-        }
-        if(typeof(ww)=="undefined" || ww=="" || ww<=0){
-            ww=750;
-        }
-        if(typeof(hh)=="undefined" || hh=="" || hh<=0){
-            hh=1136;
-        }
-    
-        var _scale=window.innerHeight/hh;
-        console.log("缩放比-----：",_scale)
-        console.log(window.innerWidth>ww*_scale)
-        var Left=window.innerWidth-(ww*_scale);
-        console.log("默认偏移值"+Left);
-        
-        $(elem).each(function(i) {
-            if(Left>=0 && Left<50){
-                _scale=window.innerWidth/ww
-                console.log("使用宽度适配",_scale)
-                var cb = elemScaleWidth($(this));
-            }else{
-                console.log("使用高度适配",_scale)
-                var cb = elemScale($(this));
-            }
-    
-           // var cb = elemScale($(this));
-            
-            $(this).css({
-                "position": "absolute",
-                "width": cb.newWidth,
-                "height": cb.newHeight,
-                "margin-left":cb.marginLeft,
-                "margin-top": cb.marginTop
-            });
-            if (callback != null) {
-                callback(cb,i,$(elem).length);
-            }
-        });
-    
-    
-        //自定义 工具对象。
-        function elemScale(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  ele.attr("height");
-            obj.Ewidth = ele.attr("width");
-        
-            obj.Eleft = ele.attr("left");
-            obj.Etop =  ele.attr("top");
-        
-            if(Left>50){
-                console.log("方形屏幕-增加1.1 的缩放值")
-                obj.scale=_scale*1.1
-               // obj.scale=window.innerHeight*(1-(0.63-scale))/hh;
-                obj.Xtop=(window.innerHeight-hh*obj.scale)/2;
-            }else{
-                obj.scale=_scale
-            }
-
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = obj.Eheight*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =(window.innerWidth-ww*obj.scale)/2+obj.Eleft*obj.scale;
-            obj.marginTop = obj.Etop*obj.scale+obj.Xtop;
-
-            
-        var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-        
-        //自定义 工具对象。
-        function elemScaleWidth(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  ele.attr("height");
-            obj.Ewidth = ele.attr("width");
-        
-            obj.Eleft = ele.attr("left");
-            obj.Etop =  ele.attr("top");
-        
-            
-            
-            obj.scale=_scale
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = obj.Eheight*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =obj.Eleft*obj.scale;
-            obj.marginTop =(window.innerHeight-hh*obj.scale)/2+obj.Etop*obj.scale;
-    
-            var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-    }
-    ms.reSet_test2=function(_elem,callback,_w,_h,_offy){
-        if(!ms.jQueryOrZepto()){
-            return;
-        }
-        var elem,ww,hh,offy;
-        elem=_elem;
-        ww=_w;
-        hh=_h;
-        offy=_offy;
-        
-        if(typeof(elem)=="undefined" || elem==""){
-            elem=".csBox";
-        }
-        if(typeof(ww)=="undefined" || ww=="" || ww<=0){
-            ww=750;
-        }
-        if(typeof(hh)=="undefined" || hh=="" || hh<=0){
-            hh=1136;
-        }
-        if(typeof(offy)=="undefined" || offy=="" || offy<=0){
-            offy=198;
-        }
-        
-        
-    
-        // var _scale=window.innerHeight/hh;
-        console.log("缩放比-----：",_scale)
-       var _scale=window.innerWidth/ww
-        var scale=window.innerWidth/window.innerHeight
-       console.log("长宽比："+scale);
-        
-        $(elem).each(function(i) {
-                console.log("使用高度适配",_scale)
-                 var cb = elemScale($(this));
-           // var cb=elemScaleWidth($(this))
-            
-           // var cb = elemScale($(this));
-            
-            $(this).css({
-                "position": "absolute",
-                "width": cb.newWidth,
-                "height": cb.newHeight,
-                "margin-left":cb.marginLeft,
-                "margin-top": cb.marginTop
-            });
-            if (callback != null) {
-                callback(cb,i,$(elem).length);
-            }
-        });
-    
-    
-        //自定义 工具对象。
-        function elemScale(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  parseInt(ele.attr("height"));
-            obj.Ewidth = parseInt(ele.attr("width"));
-        
-            obj.Eleft = parseInt(ele.attr("left"));
-            obj.Etop =  parseInt(ele.attr("top"));
-        
-             obj.scale=_scale
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = (obj.Eheight+offy)*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
- 
-            obj.marginLeft =(window.innerWidth-ww*obj.scale)/2+obj.Eleft*obj.scale;
-            // obj.marginTop = obj.Etop*obj.scale+obj.Xtop;
-            obj.marginTop = obj.Etop*obj.scale+(offy/2)*obj.scale;
-  
-            
-        var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-        
-        
-        
-        
-        
-        
-        //自定义 工具对象。
-        function elemScaleWidth(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  ele.attr("height");
-            obj.Ewidth = ele.attr("width");
-        
-            obj.Eleft = ele.attr("left");
-            obj.Etop =  ele.attr("top");
-        
-            
-            
-            obj.scale=_scale
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = obj.Eheight*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =obj.Eleft*obj.scale;
-            obj.marginTop =(window.innerHeight-hh*obj.scale)/2+obj.Etop*obj.scale;
-    
-            var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-    }
-    
-    
     /**
      *
      *
@@ -702,11 +471,11 @@
         _this.default={
             target:".csBox",
             dw:900,
-            dh:1334,
+            dh:1624,
             sw:750,
-            sh:1136,
+            sh:1204,
             safeW:750,
-            safeH:1206,
+            safeH:1204,
             offx:null,
             offy:null,
             change:function (data) {},
@@ -758,6 +527,7 @@
         }
 
         
+        console.group("宽度检测");
         console.log("宽度安全区：",_this.default.safeW*_this.default.scale)
         var newWidth=parseFloat((_this.default.dw*_this.default.scale).toFixed(3));
         
@@ -766,17 +536,24 @@
         console.log("新的整体偏移值X：",offsetX)
         var safaX=(_this.default.dw-_this.default.safeW)/2*_this.default.scale
         console.log("新的安全区边界：",safaX)
-        var isChuJie=safaX<Math.abs(offsetX);
-        console.log("安全区判断是否出界:",isChuJie);
+        var isX=safaX<Math.abs(offsetX);
+        console.log("安全区判断是否出界:",isX);
         console.log("出界差值:",safaX-Math.abs(offsetX));
         var xxx=(safaX-Math.abs(offsetX))/_this.default.width
         console.log("出界缩放值调整：",xxx)
-        if(isChuJie){
+        
+        if(isX && ms.isPC!=true){
              _this.default.scale+=xxx
             console.log("修订缩放值：",_this.default.scale)
         }
+        
+        console.groupEnd()
 
+        
         console.log("高度度安全区",_this.default.safeH*_this.default.scale)
+
+        
+        
         
         for (var i=0;i<targets.length;i++){
           // console.log(i,targets[i]);
@@ -792,9 +569,6 @@
         }
         _this.default.complete(_this);
         
-        
-        
-
         return
         // var scale=window.innerWidth/window.innerHeight;
         // if(scale<0.56){
