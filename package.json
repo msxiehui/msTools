@@ -1,0 +1,26 @@
+{
+  "name": "mstools",
+  "version": "1.0.4",
+  "description": "自用插件",
+  "main": "msTools.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msxiehui/msTools.git"
+  },
+  "author": "msxiehui@163.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/msxiehui/msTools/issues"
+  },
+  "homepage": "https://github.com/msxiehui/msTools#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-header": "^1.8.9",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^3.0.0"
+  }
+}
