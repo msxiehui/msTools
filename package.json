@@ -1,6 +1,6 @@
 {
   "name": "mstools",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "自用插件",
   "main": "msTools.js",
   "scripts": {

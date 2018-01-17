@@ -15,7 +15,7 @@
     var ms = window.ms = window.$$ = function (selector, context) {
         return new ms.fn.init(selector, context);
     };
-    ms.version = "1.0.4";
+    ms.version = "1.0.5";
     
 
     /*
