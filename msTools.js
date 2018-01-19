@@ -314,17 +314,69 @@
 		}
 	}
     
-    // 空数据判断
-    ms.isOpenID=function(wxid) {
-        if(wxid == null || typeof(wxid) == undefined || typeof(wxid) == null || wxid == "" || wxid <= 0 || wxid == "null" || wxid == "undefined") {
-            return false;
-        } else {
-            return true;
+    
+    /**
+     * 判断字符串 状态
+     * @since 1.0.5
+     * @param str string 需要判断的 字符串
+     * @param min number 需要判断的长度，如果小于此长度 依然返回 true 认为其为空
+     * @param max bumber 需要判断的长度，如果大于此长度 依然返回 true 认为其为空
+     * @param sub array  是否排除 子字符串 如果包含 子串 返回 true  认为其为空
+     * @param exc boolean 默认为 true 是否排除 sub 的字符串，如果包含 返回 true 认为 其为 空
+     * @return {boolean}  当 str 不符合条件是 返回 true 符合条件时 返回 false
+     *
+     */
+    
+    ms.isNullStr=function(str,min,max,sub,exc) {
+	    if(typeof str !="string" && typeof str !="number"){
+	        console.log("str 类型：",typeof str);
+	        return true;
+        }else{
+            var str_str=str.toString();
+            console.log(str_str);
+            if(str_str=="" || str_str=="null" || str_str=="undefined"){
+                return true
+            }else{
+                if(min!=null){
+                    console.log("判断最小长度")
+                    if(str_str.length<min){
+                        return true;
+                    }
+                }
+                if(max!=null){
+                    console.log("判断最大长度")
+                    if(str_str.length>max){
+                        return true;
+                    }
+                }
+                if(sub!=null){
+                    exc= exc==null ? true:exc;
+                    if(Array.isArray(sub)){
+                        for( var s in sub){
+                            if(str_str.indexOf(sub[s])!=-1){
+                                return exc ? true : false;
+                            }
+                        }
+                    }else{
+                        if(str_str.indexOf(sub)!=-1){
+                           return exc ? true : false;
+                        }
+                    }
+                }
+            }
         }
+        
+        return false;
     }
     
+    
+    /**
+     * 获取项目目录（域名.com/ 后的部分 以及去掉 index.html的部分）
+     * @since 1.0.5
+     * @return {string}
+     */
+    
     ms.getPathName=function(){
-        // var webPath=window.location.pathname.substring(1);
         var webPath=window.location.pathname;
         var num=webPath.indexOf(".");
         if(num!=-1){
@@ -333,13 +385,27 @@
         var newPath=webPath.substring(0,webPath.lastIndexOf("/"));
         return newPath
     }
+    
+    
+    /**
+     * 获取项目链接（域名+目录）不包含  文件名 /index.html
+     * @since 1.0.5
+     * @return {string}
+     *
+     */
+    
     ms.getHost=function () {
        return window.location.protocol+"//"+window.location.host +ms.getPathName()+"/";
     }
     
+    
+    /**
+     * 判断是否 是IphoneX  机型
+     * @since  1.0.5
+     * @return {boolean}
+     */
 	ms.isIphoneX=function () {
         var ios=!!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
-        var isX=false;
         var scale=window.innerWidth/window.innerHeight;
         if(ios && scale<0.52){
              return true;
@@ -347,8 +413,11 @@
             return false;
         }
     }
+    
+    
     /**
-     * @since  1.0.4
+     * 获取小数点后 几位函数。
+     * @since  1.0.5
      * @param n   需要转换的数值
      * @param x 2 需要保留的位数
      * @param str false  是否需要返回 字符串型 如果是整数，是没有小数点的，所以需要返回字符型
@@ -380,124 +449,71 @@
             }
             f_x=s_x;
         };
-        return f_x;
+        return f_x ;
     }
 
     
     /**
 	 *自动缩放和定位页面中的元素
 	 * @since  1.0.1
-     * @version 0.2
-     * @requires msIphoneX  判断是否是 Iphone X
-     * @param {String}[_elem=".csBox"]  需要视频的元素 可以是 类，ID 等，如果为空则默认为 类：.csBox
-     * @param callback {Function} 回调函函数，data 当前元素的 缩放值，系数等，i 当前循环中的第几个(0开始)，num 当前总循环数
-     * @param _w 设计图宽度  默认为 750；
-     * @param _h 设计图高度   默认为 1136 如果想内容放大就修改 此值。缩放比例以此值为准。
+     * @version 0.3
+     * @param {Object}
+     *          target:".csBox",  需要缩放的元素。 支持 # 和 . 号
+     *          dw:900,  设计稿宽度
+     *          dh:1624, 设计稿高度
+     *          sw:750,  缩放规则宽度
+     *          sh:1204, 缩放规则高度
+     *          safeW:750, 安全区的宽度
+     *          safeH:1204,安全区的高度
+     *          offx:null,  页面宽度偏移值 默认为 null 自动计算 (sw-dw) /2 不建议设置
+     *          offy:null, 页面高度偏移值 默认为 null 自动计算 (sh-dh) /2  不建议设置
+     *          scaleAutoWidth:true, 当页面宽度超出安全范围时，是否自动缩放页面，以保证页面内容完整显示
+     *          scaleAutoHeight:true,当页面高度超出安全范围时，是否自动缩放页面，以保证页面内容完整显示（当宽度已经缩放时，高度不进行缩放）
+     *          change:function (data) {}, 改变回调每完成一个元素的适配回调一次
+     *          complete:function (data) {},完成回调 当target 所有的元素全部适配完成时 回调
+     *          scale:null,整体的缩放系数。默认为 null 自动计算。不建议设置
+     *          width:window.innerWidth, 页面的宽度。 自动取值，不建议设置
+     *          height:window.innerHeight, 页面高度。自动取值，不建议设置
+     *
+     *
+     * 新增：iforce-type  iforce-x  iforce-y 三个标签
+     * 当 设置iforce-type 标签时，忽略 left 和 top 的位置信息，根据  iforce-x，iforce-x 重新计算元素位置。
+     * 且 元素位置 依据 窗口大小 进行定位。
+     *
+     *
      * @example
      * 页面元素设置  宽 高 x y cs-name 等内容；
-     * <div class="csBox" width="100" height="100" left="130" top="64" cs-name="namebox"></div>
-     * 如果没有 cs-name 属性则 name 为 src 内容;
-     * ms.rest("ID/class",function(data,i,total){
-     * data.target  -当前缩放元素
-     * data.Eheight  -原始高度
-     * data.Ewidth 原始宽度
-     * data.scale 缩放系数
-     * data.Eleft原始 left
-     * data.Etop 原始 top
-     * data.newWidth 新的宽度度
-     * data.newHeight 新的高度
-     * data.marginLeft 新的margin-left
-     * data.marginTop 新的margin-top
-     * data.name 元素名称 取 cs-name 值 为空则取 src 的值。
-     * },750,1136);
+     * <div class="csBox" iforce-type="left top" iforce-x="10" iforce-y="10" width="100" height="100" left="75" top="210"></div>
+     * ms.reSet({
+     *      dw:900,
+     *      dh:1624,
+     *      sw:750,
+     *      sh:1200,
+     *      change:function (data) {
+     *                data.target  -当前缩放元素
+     *                data.Eheight  -原始高度
+     *                data.Ewidth 原始宽度
+     *                data.scale 缩放系数
+     *                data.Eleft原始 left
+     *                data.Etop 原始 top
+     *                data.newWidth 新的宽度度
+     *                data.newHeight 新的高度
+     *                data.marginLeft 新的margin-left
+     *                data.marginTop 新的margin-top
+     *      },
+     *      complete:function (data) {
+     *        //
+     *
+     *        data.targets 缩放元素列表（包含缩放信息）
+     *        data.default 所有的缩放设置
+     *        data.param 用户设置
+     *        data.autoScaleW 宽度自动缩放的信息
+     *        data.autoScaleH 高度自动缩放的信息
+     *      }
+     *  });
      *
      */
-
-
-    ms.reSet=function(_elem,callback,_w,_h){
-        if(!ms.jQueryOrZepto()){
-            return;
-        }
-        var elem,ww,hh;
-        elem=_elem;
-        ww=_w;
-        hh=_h;
-        if(typeof(elem)=="undefined" || elem==""){
-            elem=".csBox";
-        }
-        if(typeof(ww)=="undefined" || ww=="" || ww<=0){
-            ww=750;
-        }
-        if(typeof(hh)=="undefined" || hh=="" || hh<=0){
-            hh=1136;
-        }
-    
-        var isX=false;
-        var scale=window.innerWidth/window.innerHeight;
-        if(scale<0.56){
-            isX=true;
-        }
-        $(elem).each(function(i) {
-            var cb = elemScale($(this));
-            $(this).css({
-                "position": "absolute",
-                "width": cb.newWidth,
-                "height": cb.newHeight,
-                "margin-left":cb.marginLeft,
-                "margin-top": cb.marginTop
-            });
-            if (callback != null) {
-                callback(cb,i,$(elem).length);
-            }
-        });
-    
-        //自定义 工具对象。
-        function elemScale(ele) {
-            var obj={}
-            obj.target=ele;
-            obj.Eheight =  ele.attr("height");
-            obj.Ewidth = ele.attr("width");
-        
-            obj.Eleft = ele.attr("left");
-            obj.Etop =  ele.attr("top");
-        
-            obj.scale=window.innerHeight/hh;
-            obj.Xtop=0;
-            if(isX){
-                console.log("矮小比例")
-                 obj.scale=window.innerHeight*(1-(0.63-scale))/hh;
-                 obj.Xtop=(window.innerHeight-hh*obj.scale)/2;
-            }
-
-            obj.newWidth =  obj.Ewidth*obj.scale;
-            obj.newHeight = obj.Eheight*obj.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            obj.marginLeft =(window.innerWidth-ww*obj.scale)/2+obj.Eleft*obj.scale;
-            obj.marginTop = obj.Etop*obj.scale+obj.Xtop;
-
-            var name=ele.attr("cs-name");
-            if(name!=""){
-                obj.name=name;
-            }else{
-                obj.name=ele.attr("src");
-            }
-        
-            return obj;
-        }
-    }
-    
-    /**
-     *
-     *
-     * 设计稿尺寸，缩放尺寸。自定义偏移值
-     * @param _elem
-     * @param callback
-     * @param _w
-     * @param _h
-     * @param _offx
-     * @param _offy
-     */
-    ms.reSet_test3=function(param){
+    ms.reSet=function(param){
         // if(!ms.jQueryOrZepto()){
         //     return;
         // }
@@ -608,13 +624,16 @@
             }
         }
         
+        _this.autoScaleW=autoScaleW;
+        _this.autoScaleH=autoScaleH;
         
     
         for (var i=0;i<targets.length;i++){
           // console.log(i,targets[i]);
             var ele=targets[i];
-            _this.targets.push(ele);
+            
             var cb=elemScale(ele);
+            _this.targets.push(cb)
             ele.style.width=cb.newWidth+"px";
             ele.style.height=cb.newHeight+"px";
             ele.style.position="absolute";
@@ -644,14 +663,12 @@
             
             obj.Etype=ele.getAttribute("iforce-type");
             if(obj.Etype!=null && obj.Etype!=""){
-                console.log("特殊配置")
-                
+                //console.log("特殊配置")
                 if(obj.Etype.indexOf(" ")!=-1){
                     var type=obj.Etype.split(" ");
                     obj.Tx = type[0]!=null && type[0]!="" ? type[0]: null
                     obj.Ty = type[1]!=null && type[1]!="" ? type[1]: null
                 }else{
-                    
                     obj.Tx=obj.Etype;
                     if(obj.Etype=="center"){
                         obj.Ty="center";
@@ -677,7 +694,6 @@
                         break;
                     case "center":
                         obj.marginLeft=(_this.default.width-obj.newWidth)/2+obj.Xaxis
-                        console.log(obj.marginLeft);
                         break;
                     case "right":
                         obj.marginLeft=(_this.default.width-obj.newWidth)-obj.Xaxis
@@ -701,121 +717,10 @@
                         break;
                 }
             }
-            
-            
-            
-            
-            
+
             return obj;
         }
     }
-    
-    /**
-	 *自动缩放和定位页面中的元素
-	 * @since  1.0.1
-     * @version 0.2
-     * @param {String}[_elem=".csBox"]  需要视频的元素 可以是 类，ID 等，如果为空则默认为 类：.csBox
-     * @param callback {Function} 回调函函数，data 当前元素的 缩放值，系数等，i 当前循环中的第几个(0开始)，num 当前总循环数
-     * @param _w 设计图宽度  默认为 750；
-     * @param _h 设计图高度   默认为 1136 如果想内容放大就修改 此值。缩放比例以此值为准。
-     * @example
-     * 页面元素设置  宽 高 x y cs-name 等内容；
-     * <div class="csBox" width="100" height="100" left="130" top="64" cs-name="namebox"></div>
-     * 如果没有 cs-name 属性则 name 为 src 内容;
-     * ms.rest("ID/class",function(data,i,total){
-     * data.target  -当前缩放元素
-     * data.Eheight  -原始高度
-     * data.Ewidth 原始宽度
-     * data.scale 缩放系数
-     * data.Eleft原始 left
-     * data.Etop 原始 top
-     * data.newWidth 新的宽度度
-     * data.newHeight 新的高度
-     * data.marginLeft 新的margin-left
-     * data.marginTop 新的margin-top
-     * data.name 元素名称 取 cs-name 值 为空则取 src 的值。
-     * },750,1136);
-     *
-     */
-
-    ms.reSetW_test=function(_elem,callback,_w,_h){
-         if(!ms.jQueryOrZepto()){
-             return;
-         }
-         var elem,ww,hh;
-        elem=_elem;
-        ww=_w;
-        hh=_h;
-         if(typeof(elem)=="undefined" || elem==""){
-            elem=".csBox";
-        }
-        if(typeof(ww)=="undefined" || ww=="" || ww<=0){
-           ww=750;
-        }
-        if(typeof(hh)=="undefined" || hh=="" || hh<=0){
-            hh=1136;
-        }
-    
-    
-        var ios=!!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
-        var isX=false;
-        console.log(ios);
-        var scale=window.innerWidth/window.innerHeight;
-        if(ios && scale<0.52){
-            console.log("这是苹果X噢")
-        }
-        
-        
-        
-        $(elem).each(function(i) {
-            var data = elemScale($(this));
-            $(this).css({
-                "position": "absolute",
-                "width": data.newWidth,
-                "height": data.newHeight,
-                "margin-left":data.marginLeft,
-                "margin-top": data.marginTop
-            });
-
-            if (callback != null) {
-
-                callback(data,i,$(elem).length);
-            }
-        });
-        //自定义 工具对象。
-        function elemScale(ele) {
-            this.target=ele;
-            this.Eheight =  ele.attr("height");
-            this.Ewidth = ele.attr("width");
-            this.scale=window.innerWidth/ww;
-            if(ios && scale<0.52){
-                console.log("这是苹果X噢")
-                console.log(scale)
-               // this.scale=window.innerHeight*(1-(0.63-scale))/hh;
-            }
-           
-            this.Eleft = ele.attr("left");
-            this.Etop =  ele.attr("top");
-            this.newWidth =  this.Ewidth*this.scale;
-            this.newHeight = this.Eheight*this.scale;
-            //左右位置： （窗口宽度 - 设置宽度*缩放系数 ）/2 + 坐标位置*缩放系数
-            
-            this.marginLeft =this.Eleft*this.scale;
-            this.marginTop =(window.innerHeight-hh*this.scale)/2+this.Etop*this.scale;
-            
-            
-            var name=ele.attr("cs-name");
-            if(name!=""){
-                this.name=name;
-            }else{
-                this.name=ele.attr("src");
-            }
-
-            return this;
-        }
-    }
-    
- 
 
     /**------------------------------------------------字符串操作*/
 

@@ -21,7 +21,7 @@
 </head>
 <body>
     <img src="img/900-1624-z.jpg" class="music csBox" id="1" width="900" height="1624" left="0" top="0">
-    <div class="csBox" iforce-type="left top" iforce-x="0" width="100" height="100" left="75" top="210"></div>
+    <div class="csBox" iforce-type="left top" iforce-x="10" iforce-y="10" width="100" height="100" left="75" top="210"></div>
     <div class="csBox" iforce-type="left center" iforce-x="0" width="100" height="100" left="75" top="210"></div>
     <div class="csBox" iforce-type="left bottom" iforce-x="0" width="100" height="100" left="75" top="210"></div>
     <div class="csBox" iforce-type="center" iforce-x="0" width="100" height="100" left="75" top="210"></div>
@@ -56,16 +56,16 @@
 
         //  return
 
-    ms.reSet_test3({
+    ms.reSet({
         dw:900,
         dh:1624,
         sw:750,
-        sh:1204,
+        sh:1200,
         change:function (data) {
-            console.log(data)
+            // console.log(data)
         },
         complete:function (data) {
-           //console.log(data)
+           console.log(data)
         }
     });
 
