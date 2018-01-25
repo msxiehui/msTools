@@ -874,12 +874,12 @@
      * 验证是否是手机号
      * @since  1.0.1
      * @param  {String} 手机号的字符串。
-     ** @returns {Boolean}
+     * @returns {Boolean}
      * @example
      * <p>    str = 18801333342
      */
     ms.isPhone = function (str) {
-        var pattern = /^1[34578]\d{9}$/;
+        var pattern = /^1[3456789]\d{9}$/;
         if (pattern.test(str)) {
             return true;
         }
