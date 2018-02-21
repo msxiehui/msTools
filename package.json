@@ -1,6 +1,7 @@
 {
   "name": "mstools",
-  "version": "1.0.5",
+  "version": "1.0",
+  "internalversion": "5.0222-aplha",
   "description": "自用插件",
   "main": "msTools.js",
   "scripts": {

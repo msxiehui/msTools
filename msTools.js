@@ -15,8 +15,10 @@
     var ms = window.ms = window.$$ = function (selector, context) {
         return new ms.fn.init(selector, context);
     };
-    ms.version = "1.0.5";
-    
+
+    ms.buildversion="1.0";
+    ms.internalversion = "5.0222-aplha";
+    ms.version = ms.buildversion+"."+ms.internalversion;
 
     /*
      *  ****************************内置属性  不做太多设置，
@@ -721,6 +723,273 @@
             return obj;
         }
     }
+
+    ms.reSetV=function(param){
+        // if(!ms.jQueryOrZepto()){
+        //     return;
+        // }
+
+        var _this={};
+        _this.default={
+            target:".csBox",
+            dw:900,
+            dh:1624,
+            sw:750,
+            sh:1200,
+            safeW:750,
+            safeH:1200,
+            offx:null,
+            offy:null,
+            scaleAutoWidth:true,
+            scaleAutoHeight:true,
+            change:function (data) {},
+            complete:function (data) {},
+            scale:null,
+            width:window.innerWidth,
+            height:window.innerHeight
+        };
+
+        _this.targets=[];
+        _this.param = param || {}
+
+        for (var key in _this.param)  {
+            _this.default[key]=_this.param[key]
+            for(var s in _this.param[key]){
+                _this.default[key][s]=_this.param[key][s]
+            }
+        }
+
+
+        if(_this.default.scale==null){
+            _this.default.scale = _this.default.width/_this.default.sh;
+            _this.default.scale=ms.getFloat(_this.default.scale,4);
+        }
+
+        console.log(_this.default.scale);
+
+
+
+        if(_this.default.offy==null){
+            _this.default.offy=(_this.default.sw-_this.default.dw)/2
+        }
+
+        if(_this.default.offx==null){
+            _this.default.offx=(_this.default.sh-_this.default.dh)/2
+        }
+
+
+        var strOne=_this.default.target.slice(0,1);
+        if(strOne=="#"){
+            console.log("使用 ID 选择器")
+            var targets=document.getElementById(_this.default.target.slice(1));
+        }else if (strOne=="."){
+            console.log("使用 类 选择器")
+            var targets=document.getElementsByClassName(_this.default.target.slice(1));
+        }else{
+            console.log("默认：使用类 选择器")
+            var targets=document.getElementsByClassName(_this.default.target);
+        }
+
+
+        var autoScaleH={}
+
+        // 横屏状态下，优先根据高度（及设计稿的宽度） 进行缩放计算
+        if(_this.default.scaleAutoHeight==true){
+            //整体的偏移值 Y --横屏状态下，高度相当于设计稿的宽度。因此使用 页面的高度-设计宽度
+            autoScaleH.offsetY=(_this.default.height-_this.default.dw*_this.default.scale)/2;
+            autoScaleH.offsetY=ms.getFloat(autoScaleH.offsetY,4);
+
+            //新的安全区域顶部坐标起点
+            autoScaleH.safaY=(_this.default.safeW-_this.default.dw)/2*_this.default.scale
+            autoScaleH.safaY=ms.getFloat(autoScaleH.safaY,4)
+
+            //安全区是否被裁剪
+            autoScaleH.isY=autoScaleH.offsetY<autoScaleH.safaY;
+
+            //修正缩放系数，保证安全区显示
+            autoScaleH.reScaleH=(autoScaleH.offsetY-autoScaleH.safaY)/_this.default.height;
+
+            autoScaleH.reScaleH=ms.getFloat(autoScaleH.reScaleH,4);
+            if(autoScaleH.isY){
+               _this.default.scale+=autoScaleH.reScaleH;
+               _this.default.scale=ms.getFloat(_this.default.scale,4);
+               console.warn("横屏-根据高度-缩放系数重新修订：",_this.default.scale)
+            }
+        }
+
+
+             var autoScaleW={}
+
+               // 如果 允许自动缩放且宽度没有进行缩放，再进行高度的检测。节省资源。
+               if(autoScaleW.isY==false && _this.default.scaleAutoWidth==true){
+                   autoScaleW.newWidth=parseFloat((_this.default.dw*_this.default.scale).toFixed(3));
+                   //整体的偏移值 X
+                   autoScaleW.offsetX=(_this.default.width-_this.default.dh*_this.default.scale)/2
+                   autoScaleW.offsetX=ms.getFloat(autoScaleW.offsetX,4);
+                   autoScaleW.safaX=(_this.default.dh-_this.default.safeH)/2*_this.default.scale
+                   autoScaleW.safaX=ms.getFloat(autoScaleW.safaX,4);
+                   autoScaleW.isX=autoScaleW.offsetX<autoScaleW.offsetX;
+                   //修正缩放系数，保证安全区显示
+                   autoScaleW.reScaleW=(autoScaleW.offsetX-autoScaleW.safaX)/_this.default.width;
+                   autoScaleW.reScaleW=ms.getFloat(autoScaleW.reScaleW,4);
+
+                   if(autoScaleH.isY){
+                       _this.default.scale+=autoScaleW.reScaleW;
+                       console.warn("根据宽度-缩放系数重新修订：",_this.default.scale)
+                   }
+               }
+
+
+               _this.autoScaleW=autoScaleW;
+               _this.autoScaleH=autoScaleH;
+
+        for (var i=0;i<targets.length;i++){
+          // console.log(i,targets[i]);
+            var ele=targets[i];
+
+            var cb=elemScale(ele);
+            _this.targets.push(cb);
+           // ele.style.transformOrigin="0% 50% 0";
+
+            ele.style.width=cb.newWidth+"px";
+            ele.style.height=cb.newHeight+"px";
+            ele.style.position="absolute";
+            ele.style.marginLeft=cb.marginLeft+"px";
+            ele.style.marginTop=cb.marginTop+"px";
+           ele.style.transformOrigin="0px 0px 0px";
+           ele.style.transform="rotate(-90deg)";
+
+            _this.default.change(cb);
+        }
+        _this.default.complete(_this);
+
+        //自定义 工具对象。
+        function elemScale(ele) {
+            var obj={}
+            obj.target=ele;
+
+            obj.Eheight = parseFloat(ele.getAttribute("height"));
+            obj.Ewidth = parseFloat(ele.getAttribute("width"));
+
+            obj.Eleft = parseFloat(ele.getAttribute("left"));
+            obj.Etop =  parseFloat(ele.getAttribute("top"));
+
+            obj.scale=_this.default.scale;
+            obj.newWidth =  obj.Ewidth*_this.default.scale;
+            obj.newHeight = obj.Eheight*_this.default.scale;
+
+            obj.marginTop =(_this.default.height -_this.default.sw*_this.default.scale)/2+(obj.Eleft+_this.default.offy)*_this.default.scale;
+            obj.marginTop=(obj.marginTop+obj.newHeight)/2;
+            obj.marginLeft =(_this.default.width -_this.default.sh*_this.default.scale)/2+(obj.Etop+_this.default.offx)*_this.default.scale;
+
+
+
+
+            obj.Etype=ele.getAttribute("iforce-type");
+            if(obj.Etype!=null && obj.Etype!=""){
+                //console.log("特殊配置")
+                if(obj.Etype.indexOf(" ")!=-1){
+                    var type=obj.Etype.split(" ");
+                    obj.Tx = type[0]!=null && type[0]!="" ? type[0]: null
+                    obj.Ty = type[1]!=null && type[1]!="" ? type[1]: null
+                }else{
+                    obj.Tx=obj.Etype;
+                    if(obj.Etype=="center"){
+                        obj.Ty="center";
+                    }else{
+                        obj.Ty="top";
+                    }
+                }
+
+
+                //X 轴 Y轴 的距离值。
+                obj.Xaxis=parseInt(ele.getAttribute("iforce-x"));
+                obj.Yaxis=parseInt(ele.getAttribute("iforce-y"));
+
+
+                // 值为空时 赋值为 0
+                obj.Xaxis=isNaN(obj.Xaxis) ? 0 : obj.Xaxis;
+                obj.Yaxis=isNaN(obj.Yaxis) ? 0 : obj.Yaxis;
+
+
+                switch (obj.Tx){
+                    case "left":
+                        obj.marginLeft=obj.Xaxis
+                        break;
+                    case "center":
+                        obj.marginLeft=(_this.default.width-obj.newWidth)/2+obj.Xaxis
+                        break;
+                    case "right":
+                        obj.marginLeft=(_this.default.width-obj.newWidth)-obj.Xaxis
+                        break;
+                    default:
+                        obj.marginLeft=obj.Xaxis
+                        break
+                }
+                switch (obj.Ty){
+                    case "top":
+                        obj.marginTop =obj.Yaxis;
+                        break;
+                    case "center":
+                        obj.marginTop =(_this.default.height-obj.newHeight)/2+obj.Yaxis;
+                        break;
+                    case "bottom":
+                        obj.marginTop =_this.default.height-obj.newHeight-obj.Yaxis;
+                        break;
+                    default:
+                        obj.marginTop =obj.Yaxis;
+                        break;
+                }
+            }
+
+            return obj;
+        }
+    }
+
+    ms.orientation=function (cb) {
+        var _this={};
+
+        var supportOrientation = (typeof window.orientation === 'number' &&
+            typeof window.onorientationchange === 'object');
+            var htmlNode = document.body.parentNode,
+                orientation;
+
+            var updateOrientation = function(){
+                if(supportOrientation){
+                    orientation = window.orientation;
+                    switch(orientation){
+                        case 90:
+                        case -90:
+                            orientation = 'landscape';
+                            break;
+                        default:
+                            orientation = 'portrait';
+                            break;
+                    }
+                }else{
+                    orientation = (window.innerWidth > window.innerHeight) ? 'landscape' : 'portrait';
+                }
+
+                htmlNode.setAttribute('class',orientation);
+                _this.orientation=orientation;
+                _this.status= orientation=="landscape" ? 0:1;
+                _this.msg= orientation=="landscape" ? "横":"竖";
+
+                if (cb!=null){
+                    cb(_this);
+                }
+            };
+
+
+            if(supportOrientation){
+                window.addEventListener('orientationchange',updateOrientation,false);
+            }else{
+                //监听resize事件
+                window.addEventListener('resize',updateOrientation,false);
+            }
+            updateOrientation();
+
+    };
 
     /**------------------------------------------------字符串操作*/
 
