@@ -531,6 +531,9 @@
             safeH:1200,
             offx:null,
             offy:null,
+            offy:null,
+            transformOrigin:"50%",
+            rotate:0,
             scaleAutoWidth:true,
             scaleAutoHeight:true,
             change:function (data) {},
@@ -641,6 +644,9 @@
             ele.style.position="absolute";
             ele.style.marginLeft=cb.marginLeft+"px";
             ele.style.marginTop=cb.marginTop+"px";
+            ele.style.transformOrigin=_this.default.transformOrigin;
+            ele.style.transform="rotate("+_this.default.rotate+"deg)";
+
             _this.default.change(cb);
         }
         _this.default.complete(_this);
@@ -725,6 +731,7 @@
     }
 
     ms.reSetV=function(param){
+
         // if(!ms.jQueryOrZepto()){
         //     return;
         // }
@@ -740,6 +747,8 @@
             safeH:1200,
             offx:null,
             offy:null,
+            transformOrigin:"0px 0px 0px",
+            rotate:-90,
             scaleAutoWidth:true,
             scaleAutoHeight:true,
             change:function (data) {},
@@ -791,57 +800,62 @@
         }
 
 
-        var autoScaleH={}
+
+             var autoScaleW={}
+
+               // 如果 允许自动缩放且进行宽度的检测。
+               if(_this.default.scaleAutoWidth==true){
+                   autoScaleW.newWidth=parseFloat((_this.default.dw*_this.default.scale).toFixed(3));
+                   //整体的偏移值 X
+                   autoScaleW.offsetX=(_this.default.width-_this.default.dh*_this.default.scale)/2
+                   autoScaleW.offsetX=ms.getFloat(autoScaleW.offsetX,4);
+                   autoScaleW.safaX=(_this.default.safeH-_this.default.dh)/2*_this.default.scale;
+
+                   autoScaleW.safaX=ms.getFloat(autoScaleW.safaX,4);
+                   autoScaleW.isX=autoScaleW.offsetX<autoScaleW.offsetX;
+
+                   //修正缩放系数，保证安全区显示
+                   autoScaleW.reScaleW=(autoScaleW.offsetX-autoScaleW.safaX)/_this.default.width;
+                   autoScaleW.reScaleW=ms.getFloat(autoScaleW.reScaleW,4);
+
+                   if(autoScaleW.isX){
+                       _this.default.scale+=autoScaleW.reScaleW;
+                       console.warn("根据宽度-缩放系数重新修订：",_this.default.scale)
+                   }
+               }
+
+        var autoScaleH={};
 
         // 横屏状态下，优先根据高度（及设计稿的宽度） 进行缩放计算
-        if(_this.default.scaleAutoHeight==true){
+        if(autoScaleW.isX==false && _this.default.scaleAutoHeight==true){
             //整体的偏移值 Y --横屏状态下，高度相当于设计稿的宽度。因此使用 页面的高度-设计宽度
             autoScaleH.offsetY=(_this.default.height-_this.default.dw*_this.default.scale)/2;
             autoScaleH.offsetY=ms.getFloat(autoScaleH.offsetY,4);
 
             //新的安全区域顶部坐标起点
             autoScaleH.safaY=(_this.default.safeW-_this.default.dw)/2*_this.default.scale
-            autoScaleH.safaY=ms.getFloat(autoScaleH.safaY,4)
+
+          //  console.log(_this.default.safeW,_this.default.dw);
+
+            autoScaleH.safaY=ms.getFloat(autoScaleH.safaY,4);
 
             //安全区是否被裁剪
-            autoScaleH.isY=autoScaleH.offsetY<autoScaleH.safaY;
+             autoScaleH.isY=autoScaleH.offsetY<autoScaleH.safaY;
 
             //修正缩放系数，保证安全区显示
             autoScaleH.reScaleH=(autoScaleH.offsetY-autoScaleH.safaY)/_this.default.height;
 
             autoScaleH.reScaleH=ms.getFloat(autoScaleH.reScaleH,4);
             if(autoScaleH.isY){
-               _this.default.scale+=autoScaleH.reScaleH;
-               _this.default.scale=ms.getFloat(_this.default.scale,4);
-               console.warn("横屏-根据高度-缩放系数重新修订：",_this.default.scale)
+                _this.default.scale+=autoScaleH.reScaleH;
+                _this.default.scale=ms.getFloat(_this.default.scale,4);
+                console.warn("横屏-根据高度-缩放系数重新修订：",_this.default.scale)
             }
         }
 
 
-             var autoScaleW={}
-
-               // 如果 允许自动缩放且宽度没有进行缩放，再进行高度的检测。节省资源。
-               if(autoScaleW.isY==false && _this.default.scaleAutoWidth==true){
-                   autoScaleW.newWidth=parseFloat((_this.default.dw*_this.default.scale).toFixed(3));
-                   //整体的偏移值 X
-                   autoScaleW.offsetX=(_this.default.width-_this.default.dh*_this.default.scale)/2
-                   autoScaleW.offsetX=ms.getFloat(autoScaleW.offsetX,4);
-                   autoScaleW.safaX=(_this.default.dh-_this.default.safeH)/2*_this.default.scale
-                   autoScaleW.safaX=ms.getFloat(autoScaleW.safaX,4);
-                   autoScaleW.isX=autoScaleW.offsetX<autoScaleW.offsetX;
-                   //修正缩放系数，保证安全区显示
-                   autoScaleW.reScaleW=(autoScaleW.offsetX-autoScaleW.safaX)/_this.default.width;
-                   autoScaleW.reScaleW=ms.getFloat(autoScaleW.reScaleW,4);
-
-                   if(autoScaleH.isY){
-                       _this.default.scale+=autoScaleW.reScaleW;
-                       console.warn("根据宽度-缩放系数重新修订：",_this.default.scale)
-                   }
-               }
-
-
                _this.autoScaleW=autoScaleW;
-               _this.autoScaleH=autoScaleH;
+              _this.autoScaleH=autoScaleH;
 
         for (var i=0;i<targets.length;i++){
           // console.log(i,targets[i]);
@@ -856,13 +870,13 @@
             ele.style.position="absolute";
             ele.style.marginLeft=cb.marginLeft+"px";
             ele.style.marginTop=cb.marginTop+"px";
-           ele.style.transformOrigin="0px 0px 0px";
-           ele.style.transform="rotate(-90deg)";
+            ele.style.transformOrigin=_this.default.transformOrigin;
+            ele.style.transform="rotate("+_this.default.rotate+"deg)";
+
 
             _this.default.change(cb);
         }
         _this.default.complete(_this);
-
         //自定义 工具对象。
         function elemScale(ele) {
             var obj={}
@@ -877,13 +891,6 @@
             obj.scale=_this.default.scale;
             obj.newWidth =  obj.Ewidth*_this.default.scale;
             obj.newHeight = obj.Eheight*_this.default.scale;
-
-            obj.marginTop =(_this.default.height -_this.default.sw*_this.default.scale)/2+(obj.Eleft+_this.default.offy)*_this.default.scale;
-            obj.marginTop=(obj.marginTop+obj.newHeight)/2;
-            obj.marginLeft =(_this.default.width -_this.default.sh*_this.default.scale)/2+(obj.Etop+_this.default.offx)*_this.default.scale;
-
-
-
 
             obj.Etype=ele.getAttribute("iforce-type");
             if(obj.Etype!=null && obj.Etype!=""){
@@ -903,8 +910,8 @@
 
 
                 //X 轴 Y轴 的距离值。
-                obj.Xaxis=parseInt(ele.getAttribute("iforce-x"));
-                obj.Yaxis=parseInt(ele.getAttribute("iforce-y"));
+                obj.Xaxis=parseInt(ele.getAttribute("iforce-y"));
+                obj.Yaxis=parseInt(ele.getAttribute("iforce-x"));
 
 
                 // 值为空时 赋值为 0
@@ -914,16 +921,16 @@
 
                 switch (obj.Tx){
                     case "left":
-                        obj.marginLeft=obj.Xaxis
+                        obj.marginLeft=obj.Xaxis;
                         break;
                     case "center":
-                        obj.marginLeft=(_this.default.width-obj.newWidth)/2+obj.Xaxis
+                        obj.marginLeft=(_this.default.width-obj.newWidth)/2+obj.Xaxis;
                         break;
                     case "right":
-                        obj.marginLeft=(_this.default.width-obj.newWidth)-obj.Xaxis
+                        obj.marginLeft=(_this.default.width-obj.newWidth)-obj.Xaxis;
                         break;
                     default:
-                        obj.marginLeft=obj.Xaxis
+                        obj.marginLeft=obj.Xaxis;
                         break
                 }
                 switch (obj.Ty){
@@ -940,14 +947,30 @@
                         obj.marginTop =obj.Yaxis;
                         break;
                 }
+                //旋转后，修正50%的高度值
+                obj.marginTop=obj.marginTop+obj.newHeight;
+            }else{
+                obj.marginTop =(_this.default.height -_this.default.sw*_this.default.scale)/2+(obj.Eleft+_this.default.offy)*_this.default.scale;
+                //横屏后，left 变为 top 值，但横屏后 top ，计算起点为底部，因此需要使用页面高度减去当前的top值作为新的top值;
+                obj.marginTop=_this.default.height-obj.marginTop;
+                obj.marginLeft =(_this.default.width -_this.default.sh*_this.default.scale)/2+(obj.Etop+_this.default.offx)*_this.default.scale;
+
+
             }
+
 
             return obj;
         }
     }
-
-    ms.orientation=function (cb) {
+    /**
+     * 横屏事件，带回调
+     * @param cb Function 回调函数
+     * @param time Number 默认 400 回调时间毫秒 ，横屏事件会有400ms左右的延迟，第一次立即回调，第二次开始使用延迟时间
+     */
+    ms.orientation=function (cb,time) {
         var _this={};
+        _this.currnum=0;
+        _this.time=isNaN(Number(time)) ? 400: time;
 
         var supportOrientation = (typeof window.orientation === 'number' &&
             typeof window.onorientationchange === 'object');
@@ -956,6 +979,7 @@
 
             var updateOrientation = function(){
                 if(supportOrientation){
+                    _this.event="orientationchange";
                     orientation = window.orientation;
                     switch(orientation){
                         case 90:
@@ -968,6 +992,7 @@
                     }
                 }else{
                     orientation = (window.innerWidth > window.innerHeight) ? 'landscape' : 'portrait';
+                    _this.event="resize";
                 }
 
                 htmlNode.setAttribute('class',orientation);
@@ -976,7 +1001,14 @@
                 _this.msg= orientation=="landscape" ? "横":"竖";
 
                 if (cb!=null){
-                    cb(_this);
+                    var _time=_this.time;
+                    if(_this.currnum==0){
+                        _time=10;
+                    }
+                    setTimeout(function () {
+                        _this.currnum++;
+                        cb(_this);
+                    },_time);
                 }
             };
 
