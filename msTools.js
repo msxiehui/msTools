@@ -17,7 +17,7 @@
     };
 
     ms.buildversion="1.0";
-    ms.internalversion = "5.0222-aplha";
+    ms.internalversion = "5.0228-aplha";
     ms.version = ms.buildversion+"."+ms.internalversion;
 
     /*
@@ -687,14 +687,29 @@
 
                 
                 //X 轴 Y轴 的距离值。
-                obj.Xaxis=parseInt(ele.getAttribute("iforce-x"));
-                obj.Yaxis=parseInt(ele.getAttribute("iforce-y"));
-    
+                
+                obj.Xaxis=ele.getAttribute("iforce-x");
+                obj.Yaxis=ele.getAttribute("iforce-y");
+                
+                
+              obj.Xaxis= obj.Xaxis==null ? obj.Xaxis=0: obj.Xaxis.indexOf("%")!=-1 ? parseInt(obj.Xaxis)/100*_this.default.width : parseInt(obj.Xaxis);
+              
+              obj.Yaxis= obj.Yaxis==null ? obj.Yaxis=0: obj.Yaxis.indexOf("%")!=-1 ? parseInt(obj.Yaxis)/100*_this.default.height :parseInt(obj.Yaxis);
+              
+              
+              
+                
+                console.log("-------------:"+obj.Xaxis,obj.Yaxis);
+                
+                //obj.Xaxis=parseInt(ele.getAttribute("iforce-x"));
+               // obj.Yaxis=parseInt(ele.getAttribute("iforce-y"));
+
                 
                 // 值为空时 赋值为 0
-                obj.Xaxis=isNaN(obj.Xaxis) ? 0 : obj.Xaxis;
-                obj.Yaxis=isNaN(obj.Yaxis) ? 0 : obj.Yaxis;
-    
+                // obj.Xaxis=isNaN(obj.Xaxis) ? 0 : obj.Xaxis;
+                // obj.Yaxis=isNaN(obj.Yaxis) ? 0 : obj.Yaxis;
+                
+                
                 
                 switch (obj.Tx){
                     case "left":
