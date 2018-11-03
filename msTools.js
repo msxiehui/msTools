@@ -17,7 +17,7 @@
     };
 
     ms.buildversion="1.0";
-    ms.internalversion = "5.0228-aplha";
+    ms.internalversion = "5.1103-aplha";
     ms.version = ms.buildversion+"."+ms.internalversion;
 
     /*
@@ -286,7 +286,9 @@
 			var htmlImages = document.getElementsByTagName("img");
 			var htmlImages_length = htmlImages.length;
 			for(var i = 0; i < htmlImages_length; i++) {
-				imgArr.push(htmlImages[i].src);
+				if(htmlImages[i].src){
+                    imgArr.push(htmlImages[i].src);
+                }
 			}
 		}
 
